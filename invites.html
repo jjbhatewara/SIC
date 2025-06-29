@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saarang Sponsor  Outreach Dashboard</title>
+    <title>Saarang sponsor Outreach Dashboard</title>
     <!-- Chosen Palette: Slate & Amber -->
-    <!-- Application Structure Plan: A dashboard-style SPA to manage Sponsor  outreach for the Saarang event. The core is a responsive grid of Sponsor  "cards," turning the static email list into an actionable tool. Users can filter Sponsor s by invitation status. Key interactions include updating a Sponsor 's status via a dropdown on their card, which dynamically updates summary counters and a visual chart. Clicking a button on the card opens a modal with the pre-written, customized email, complete with a copy-to-clipboard function. This structure was chosen for usability, providing a clear overview, at-a-glance status tracking, and efficient workflow management for the event organizers. -->
+    <!-- Application Structure Plan: A dashboard-style SPA to manage sponsor outreach for the Saarang event. The core is a responsive grid of sponsor "cards," turning the static email list into an actionable tool. Users can filter sponsors by invitation status. Key interactions include updating a sponsor's status via a dropdown on their card, which dynamically updates summary counters and a visual chart. Clicking a button on the card opens a modal with the pre-written, customized email, complete with a copy-to-clipboard function. This structure was chosen for usability, providing a clear overview, at-a-glance status tracking, and efficient workflow management for the event organizers. -->
     <!-- Visualization & Content Choices:
-        - Report Info: List of 50 potential Sponsor s (updated from image) and their customized email drafts for Saarang.
+        - Report Info: List of 50 potential sponsors (updated from image) and their customized email drafts for Saarang.
         - Goal: Manage outreach process for Saarang.
         - Viz/Presentation Method: An interactive dashboard with filterable cards, summary statistics, and a status visualization chart.
         - Interaction:
-            - Sponsor  List -> Interactive Cards (HTML/Tailwind): Provides a visually appealing, scannable overview of each candidate, including mobile number.
+            - sponsor List -> Interactive Cards (HTML/Tailwind): Provides a visually appealing, scannable overview of each candidate, including mobile number.
             - Invitation Status -> Dropdown & Color-coding (JS): Allows for easy, at-a-glance status tracking and updates.
             - Email Text -> Modal Popup with "Copy" button (JS): Keeps the main UI clean and makes the core content (the email) easily accessible and usable. Email content updated for Saarang theme.
             - Status Summary -> Donut Chart (Chart.js/Canvas): Offers a quick, high-level visual summary of the outreach campaign's progress.
@@ -136,7 +136,7 @@
 
     <div class="container mx-auto p-4 md:p-8">
         <header class="text-center mb-8">
-            <h1 class="text-4xl md:text-5xl font-bold text-slate-900">Saarang Sponsor  Outreach</h1>
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900">Saarang Sponsor Outreach</h1>
             <p class="text-slate-600 mt-2 max-w-2xl mx-auto">An interactive dashboard to manage and track invitations for our annual social fiesta, Saarang.</p>
         </header>
 
@@ -146,7 +146,7 @@
                 <div id="stats-container" class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
                 </div>
                 <div class="mt-8 pt-6 border-t border-slate-200">
-                    <h2 class="text-xl font-bold mb-4 text-slate-800">Filter Sponsor s</h2>
+                    <h2 class="text-xl font-bold mb-4 text-slate-800">Filter sponsors</h2>
                     <div class="flex flex-wrap gap-4 items-center">
                         <div class="relative">
                             <select id="status-filter" class="appearance-none w-full md:w-auto bg-slate-100 border border-slate-300 text-slate-700 py-2 pl-3 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-amber-500">
@@ -170,9 +170,9 @@
             </div>
         </div>
 
-        <div id="Sponsor s-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="speakers-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         </div>
-        <p id="no-results" class="text-center text-slate-500 py-10 text-lg hidden">No Sponsor s match the current filters.</p>
+        <p id="no-results" class="text-center text-slate-500 py-10 text-lg hidden">No sponsor match the current filters.</p>
     </div>
 
     <div id="email-modal" class="modal-bg">
@@ -201,7 +201,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const Sponsor Data = [{
+            const speakerData = [{
                 id: 1,
                 founders: "Abhijeet Chatterjee, Managing Director",
                 company: "Ascensive Educare Limited",
@@ -603,7 +603,7 @@
                 email: `Subject: Invitation to Saarang: Celebrate Passion, Purpose, and Entrepreneurship!\n\nDear Tarun nanda,\n\nI hope this email finds you well.\n\nMy name is [Your Name/Title] from [Your Institution Name] in Lavale, Maharashtra. We are thrilled to invite you to **Saarang**, our exhilarating 3-day extravaganza under the theme "Where Passion Meets Purpose."\n\nSaarang provides a unique stage for students and rural entrepreneurs to showcase their products, earn profits, and garner visibility. We believe your experience with Parthasarathi Investment would offer incredible insights into business development and strategic growth.\n\nYour presence at Saarang would be invaluable, offering you an opportunity to:\n\n- Connect with a diverse audience of aspiring student entrepreneurs and rural innovators.\n- Share your journey and expertise, inspiring a new generation to combine passion with social impact.\n- Gain visibility for your work and potentially discover new talents or collaborations within our bustling marketplace.\n- Contribute to our collaboration with SCOPE, channeling funds towards vital rural development initiatives.\n\nSaarang will culminate on **14th December** at [Venue]. We envision your involvement could be through a captivating guest lecture, a panel discussion, or interactive mentorship sessions, tailored to your preference.\n\nWould you be open to a brief call to discuss this further and explore your potential involvement? Please let us know your availability by [RSVP Deadline].\n\nThank you for considering our invitation. We eagerly await the possibility of welcoming you to Saarang.\n\nWarm regards,\n\n[Your Name]\n[Your Title]\n[Your Institution Name]`
             }, ];
 
-            const Sponsor sGrid = document.getElementById('Sponsor s-grid');
+            const speakersGrid = document.getElementById('speakers-grid');
             const statsContainer = document.getElementById('stats-container');
             const statusChartCtx = document.getElementById('statusChart').getContext('2d');
             const statusFilter = document.getElementById('status-filter');
@@ -643,60 +643,60 @@
             const renderCards = () => {
                 const selectedStatus = statusFilter.value;
 
-                const filteredSponsor s = Sponsor Data.filter(Sponsor  => {
-                    const statusMatch = selectedStatus === 'all' || Sponsor .status === selectedStatus;
+                const filteredSpeakers = speakerData.filter(speaker => {
+                    const statusMatch = selectedStatus === 'all' || speaker.status === selectedStatus;
                     return statusMatch;
                 });
 
-                Sponsor sGrid.innerHTML = '';
+                speakersGrid.innerHTML = '';
 
-                if (filteredSponsor s.length === 0) {
+                if (filteredSpeakers.length === 0) {
                     noResults.classList.remove('hidden');
                 } else {
                     noResults.classList.add('hidden');
-                    filteredSponsor s.forEach(Sponsor  => {
+                    filteredSpeakers.forEach(speaker => {
                         const card = document.createElement('div');
-                        card.className = `bg-white rounded-xl shadow-sm border-l-4 card-border-${Sponsor .status} p-5 flex flex-col justify-between`;
+                        card.className = `bg-white rounded-xl shadow-sm border-l-4 card-border-${speaker.status} p-5 flex flex-col justify-between`;
                         card.innerHTML = `
                             <div>
                                 <div class="flex justify-between items-start mb-2">
-                                    <h3 class="text-xl font-bold text-slate-900">${Sponsor .company}</h3>
+                                    <h3 class="text-xl font-bold text-slate-900">${speaker.company}</h3>
                                 </div>
-                                <p class="text-slate-600 mb-2 text-sm">${Sponsor .founders}</p>
+                                <p class="text-slate-600 mb-2 text-sm">${speaker.founders}</p>
                                 <p class="text-slate-500 text-xs flex items-center">
-                                    <span class="mr-1">📞</span> ${Sponsor .mobile}
+                                    <span class="mr-1">📞</span> ${speaker.mobile}
                                 </p>
                             </div>
                             <div class="mt-4 flex flex-col sm:flex-row justify-between items-center gap-3">
                                 <div class="relative w-full sm:w-auto">
-                                    <select data-id="${Sponsor .id}" class="status-select appearance-none w-full bg-slate-100 border border-slate-300 text-slate-700 py-2 pl-3 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-amber-500">
-                                        <option value="Pending" ${Sponsor .status === 'Pending' ? 'selected' : ''}>Pending</option>
-                                        <option value="Contacted" ${Sponsor .status === 'Contacted' ? 'selected' : ''}>Contacted</option>
-                                        <option value="Accepted" ${Sponsor .status === 'Accepted' ? 'selected' : ''}>Accepted</option>
-                                        <option value="Declined" ${Sponsor .status === 'Declined' ? 'selected' : ''}>Declined</option>
+                                    <select data-id="${speaker.id}" class="status-select appearance-none w-full bg-slate-100 border border-slate-300 text-slate-700 py-2 pl-3 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-amber-500">
+                                        <option value="Pending" ${speaker.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                        <option value="Contacted" ${speaker.status === 'Contacted' ? 'selected' : ''}>Contacted</option>
+                                        <option value="Accepted" ${speaker.status === 'Accepted' ? 'selected' : ''}>Accepted</option>
+                                        <option value="Declined" ${speaker.status === 'Declined' ? 'selected' : ''}>Declined</option>
                                     </select>
                                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-700">
                                         <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                                     </div>
                                 </div>
-                                <button data-id="${Sponsor .id}" class="view-email-btn bg-amber-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-amber-600 transition-colors duration-200 w-full sm:w-auto">View Email</button>
+                                <button data-id="${speaker.id}" class="view-email-btn bg-amber-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-amber-600 transition-colors duration-200 w-full sm:w-auto">View Email</button>
                             </div>
                         `;
-                        Sponsor sGrid.appendChild(card);
+                        speakersGrid.appendChild(card);
                     });
                 }
                 addEventListenersToCards();
             };
 
             const updateStats = () => {
-                const total = Sponsor Data.length;
+                const total = speakerData.length;
                 const statusCounts = {
                     Pending: 0,
                     Contacted: 0,
                     Accepted: 0,
                     Declined: 0,
                 };
-                Sponsor Data.forEach(s => statusCounts[s.status]++);
+                speakerData.forEach(s => statusCounts[s.status]++);
 
                 statsContainer.innerHTML = `
                     <div class="p-2">
@@ -723,7 +723,7 @@
                 const data = {
                     labels: Object.keys(counts),
                     datasets: [{
-                        label: 'Sponsor  Status',
+                        label: 'Speaker Status',
                         data: Object.values(counts),
                         backgroundColor: Object.values(statusColors),
                         hoverOffset: 4
@@ -755,11 +755,11 @@
             };
 
             const handleStatusChange = (e) => {
-                const Sponsor Id = parseInt(e.target.dataset.id);
+                const speakerId = parseInt(e.target.dataset.id);
                 const newStatus = e.target.value;
-                const Sponsor  = Sponsor Data.find(s => s.id === Sponsor Id);
-                if (Sponsor ) {
-                    Sponsor .status = newStatus;
+                const speaker = speakerData.find(s => s.id === speakerId);
+                if (speaker) {
+                    speaker.status = newStatus;
                     renderCards();
                     updateStats();
                 }
@@ -780,10 +780,10 @@
             };
 
             const handleViewEmail = (e) => {
-                const Sponsor Id = parseInt(e.target.dataset.id);
-                const Sponsor  = Sponsor Data.find(s => s.id === Sponsor Id);
-                if (Sponsor ) {
-                    openModalWithText(`Email for ${Sponsor .company}`, Sponsor .email);
+                const speakerId = parseInt(e.target.dataset.id);
+                const speaker = speakerData.find(s => s.id === speakerId);
+                if (speaker) {
+                    openModalWithText(`Email for ${speaker.company}`, speaker.email);
                 }
             };
 
@@ -832,7 +832,7 @@
                 refinedEmailSection.classList.add('hidden'); // Hide previous refined text
 
                 try {
-                    const prompt = `Refine the following email to be more concise and persuasive for inviting a guest Sponsor  to an event. Maintain a professional and respectful tone. Keep any placeholders like [Your Name/Title], [Your Institution Name], [iConclave Date/Time], [Venue], and [RSVP Deadline] exactly as they are. Also, make sure the subject line remains clear and concise.\n\nEmail to refine:\n${originalEmail}`;
+                    const prompt = `Refine the following email to be more concise and persuasive for inviting a guest speaker to an event. Maintain a professional and respectful tone. Keep any placeholders like [Your Name/Title], [Your Institution Name], [iConclave Date/Time], [Venue], and [RSVP Deadline] exactly as they are. Also, make sure the subject line remains clear and concise.\n\nEmail to refine:\n${originalEmail}`;
 
                     let chatHistory = [];
                     chatHistory.push({
