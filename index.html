@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Timeline</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f7fa; /* Softer, light grey-blue background */
+            color: #3f51b5; /* Deeper blue for main text */
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 960px; /* Slightly wider container */
+            width: 95%;
+            margin: 2.5rem auto; /* More margin top/bottom */
+            padding: 0; /* Remove padding from container to allow header to stretch */
+            background-color: #ffffff;
+            border-radius: 20px; /* More rounded corners */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15); /* Stronger, softer shadow */
+            overflow: hidden;
+            display: flex; /* Flex container for layout */
+            flex-direction: column;
+        }
+        .header {
+            background: linear-gradient(to right, #42a5f5, #2196f3); /* Brighter, vibrant blue gradient */
+            color: white;
+            padding: 2rem 1.5rem; /* More vertical padding */
+            text-align: center;
+            font-size: 2.8rem; /* Larger header text */
+            font-weight: 700;
+            letter-spacing: 1.5px; /* Increased letter spacing */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25); /* More pronounced shadow for header */
+            margin-bottom: 2rem; /* Space after header */
+            border-bottom: 5px solid #1976d2; /* A strong bottom border for the header */
+        }
+        .content-area {
+            padding: 0 2rem 2rem; /* Padding for the main content area */
+        }
+        .timeline-section {
+            margin-bottom: 2.5rem; /* Increased space between date sections */
+            position: relative;
+        }
+        .timeline-section:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            bottom: -1.25rem; /* Position between sections */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 1px;
+            background-color: #e0e0e0; /* Subtle divider */
+            opacity: 0.7;
+        }
+
+        .timeline-date {
+            font-size: 2rem; /* Larger date text */
+            font-weight: 700;
+            color: #3f51b5; /* Main blue for dates */
+            padding-bottom: 0.8rem; /* More padding below date */
+            margin-bottom: 1.5rem; /* More margin below date */
+            text-align: center;
+            position: relative;
+            z-index: 1; /* Ensure date is above line if any */
+            display: block;
+            background-color: #ffffff; /* Background to break the line subtly */
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #e0e0e0;
+        }
+
+        /* Card Flip Styles */
+        .event-card {
+            background-color: transparent;
+            width: 100%;
+            height: 280px; /* Increased height for more content space */
+            perspective: 1200px; /* Stronger perspective for a more pronounced flip */
+            margin-bottom: 1rem; /* More space between cards */
+            border-radius: 15px; /* More rounded corners */
+            position: relative; /* For z-index stacking */
+            z-index: 0;
+        }
+        .event-card:hover {
+            z-index: 10; /* Bring hovered card to front */
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.9s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* More dynamic transition curve */
+            transform-style: preserve-3d;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Softer initial shadow */
+            cursor: pointer;
+            overflow: hidden; /* Ensure rounded corners clip content */
+        }
+
+        .event-card:hover .card-inner {
+            transform: rotateY(180deg);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25); /* More dramatic hover shadow */
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            padding: 1.5rem; /* More padding */
+            box-sizing: border-box;
+            background-color: #ffffff;
+            border: 1px solid #cfd8dc; /* Lighter border for cards */
+            overflow: hidden;
+            display: flex; /* Use flex for consistent vertical alignment */
+            flex-direction: column;
+            justify-content: center; /* Vertically center content */
+        }
+
+        .card-front {
+            display: grid; /* Keep grid for alignment */
+            grid-template-columns: 120px 1fr 100px; /* Adjusted columns */
+            align-items: center;
+            gap: 1.5rem; /* Increased gap */
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            justify-content: flex-start; /* Align content to the top */
+            align-items: flex-start;
+            text-align: left;
+            font-size: 1rem; /* Slightly larger text on back */
+            color: #546e7a; /* Softer text color */
+            padding: 2rem; /* More padding on back */
+            overflow-y: auto; /* Allow scrolling for content on the back side */
+        }
+
+        .card-back p {
+            margin-bottom: 0.8rem; /* More space between paragraphs */
+        }
+        .card-back a {
+            color: #42a5f5; /* Link color matching header */
+            text-decoration: underline;
+            font-weight: 600;
+            margin-top: 0.8rem; /* More space above links */
+        }
+        .card-back a:hover {
+            color: #1976d2;
+        }
+        .card-back h4 {
+            font-size: 1.3rem; /* Larger heading on back */
+            font-weight: 700;
+            color: #3f51b5; /* Consistent main blue */
+            margin-bottom: 1rem; /* More space below heading */
+        }
+
+        .event-card-time {
+            font-weight: 600;
+            color: #546e7a;
+            text-align: center;
+            font-size: 1rem;
+        }
+        .event-card-activity-front {
+            font-weight: 700; /* Bolder activity title */
+            color: #3f51b5; /* Main blue for activity title */
+            font-size: 1.25rem; /* Larger activity title */
+            text-align: left;
+        }
+        .event-card-type {
+            text-align: center;
+            padding: 0.5rem 1rem; /* More padding */
+            border-radius: 30px; /* More pill-shaped */
+            font-size: 0.85rem; /* Slightly larger type text */
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08); /* Subtle shadow for type tags */
+        }
+        .event-card-type.offline {
+            background-color: #e8f5e9; /* Lighter green */
+            color: #43a047; /* Darker green */
+            border: 1px solid #a5d6a7; /* Softer border */
+        }
+        .event-card-type.online {
+            background-color: #e3f2fd; /* Lighter blue */
+            color: #2196f3; /* Darker blue */
+            border: 1px solid #90caf9; /* Softer border */
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem auto;
+                padding: 0;
+                border-radius: 0; /* Remove rounded corners on container for full width on mobile */
+            }
+            .header {
+                font-size: 2.2rem;
+                padding: 1.5rem 1rem;
+                margin-bottom: 1.5rem;
+                border-radius: 0;
+            }
+            .content-area {
+                padding: 0 1rem 1.5rem; /* Smaller padding for mobile content */
+            }
+            .timeline-date {
+                font-size: 1.4rem;
+                margin-bottom: 1rem;
+                padding: 0.6rem 1rem;
+                border-radius: 8px;
+            }
+            .timeline-section:not(:last-child)::after {
+                width: 90%; /* Wider divider on mobile */
+                bottom: -1rem;
+            }
+            .event-card {
+                height: auto; /* Allow height to adjust on mobile */
+                margin-bottom: 1rem;
+                border-radius: 10px;
+            }
+            .card-inner {
+                position: static;
+                transform-style: flat;
+                transform: none !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                border-radius: 10px;
+            }
+            .card-front, .card-back {
+                position: static;
+                backface-visibility: visible;
+                transform: none !important;
+                padding: 1rem;
+                display: block;
+                height: auto;
+                border-radius: 10px;
+            }
+            .card-front {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            .card-back {
+                margin-top: 1rem;
+                border-top: 1px dashed #e0e0e0;
+                padding-top: 1rem;
+            }
+            .event-card-time, .event-card-activity-front, .event-card-type {
+                text-align: left;
+                margin-bottom: 0.5rem;
+            }
+            .card-back h4 {
+                font-size: 1.1rem;
+                margin-bottom: 0.8rem;
+            }
+            .card-back p {
+                margin-bottom: 0.5rem;
+            }
+            .event-card-type {
+                width: fit-content;
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Event Timeline
+        </div>
+
+        <div class="content-area">
+            <!-- November 24, 2025 -->
+            <div class="timeline-section">
+                <div class="timeline-date">November 24, 2025</div>
+                <!-- Event: BINGE BATTLES -->
+                <div class="event-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="event-card-time">10:00 AM</div>
+                            <div class="event-card-activity-front">BINGE BATTLES</div>
+                            <div class="event-card-type online">Online</div>
+                        </div>
+                        <div class="card-back">
+                            <h4>BINGE BATTLES</h4>
+                            <p>The ultimate Netflix-themed trivia war that’s going to test your obsession with series, spoilers, and screen time! Quick rounds. Smart questions. No chill. Represent your college. Beat the binge. Win bragging rights (and more 👀)!</p>
+                            <p>Part of SAARANG – The Social Impact Fiesta by SIBM Pune. Open for all students from SSBF, SSSS, SIMC, SIDTM, SMCW, SIT.</p>
+                            <p><strong>Venue:</strong> SIU Mess</p>
+                            <p><strong>Prizes:</strong> Exciting prizes ( 👀)</p>
+                            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfCzMSGwXX_-qYWpGHxUOQ0s-lw8ceKZ-Pm4e28YgNezGnkaw/viewform?usp=header" target="_blank" rel="noopener noreferrer">Register now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- December 01, 2025 -->
+            <div class="timeline-section">
+                <div class="timeline-date">December 01, 2025</div>
+                <!-- Event: ROOTS & RHYTHMS -->
+                <div class="event-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="event-card-time">7:00 PM</div>
+                            <div class="event-card-activity-front">ROOTS & RHYTHMS</div>
+                            <div class="event-card-type offline">Offline</div>
+                        </div>
+                        <div class="card-back">
+                            <h4>ROOTS & RHYTHMS</h4>
+                            <p>A Cultural Parade of Hope 💫 Step into your roots, strut your culture, and let tradition take the spotlight in a fashion show like no other! Flaunt your regional or ethnic attire – be it Bengali saree, Tamil veshti, Nepali daura, Gujarati chaniya choli, or African prints… Walk. Represent your heritage.</p>
+                            <p><strong>Venue:</strong> Auditorium</p>
+                            <p><strong>Prizes:</strong> Certificates + Spotlight + Cultural Fame Await!</p>
+                            <p>📸 Captured by iSmart – get Insta-famous in your ethnic glam!</p>
+                            <a href="https://docs.google.com/forms/d/e/1FAIpQLSexzhaMf_ZiCY1p5WPbhamI1--SPXBOW-ee6BcCTVyrXdRlZg/viewform?usp=header" target="_blank" rel="noopener noreferrer">Register now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- December 12, 2025 -->
+            <div class="timeline-section">
+                <div class="timeline-date">December 12, 2025</div>
+                <!-- Event: Thread of Hope - Symbi Flea Market (Day 1) -->
+                <div class="event-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="event-card-time">10:00 AM – 8:00 PM</div>
+                            <div class="event-card-activity-front">Thread of Hope - Symbi Flea Market (Day 1)</div>
+                            <div class="event-card-type offline">Offline</div>
+                        </div>
+                        <div class="card-back">
+                            <h4>Thread of Hope - Symbi Flea Market (Day 1)</h4>
+                            <p>This is the first day of the highly anticipated Thread of Hope - Symbi Flea Market. Explore a variety of stalls featuring local artisans, unique crafts, delicious food, and fun activities for all ages. Don't miss out on great deals and a lively atmosphere!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event: Offline Case Competition 1 -->
+                <div class="event-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="event-card-time">2:00 PM – 4:00 PM</div>
+                            <div class="event-card-activity-front">Offline Case Competition 1</div>
+                            <div class="event-card-type offline">Offline</div>
+                        </div>
+                        <div class="card-back">
+                            <h4>Offline Case Competition 1</h4>
+                            <p>Participants will tackle a challenging real-world business problem in this intensive offline case competition. Teams will present their solutions to a panel of expert judges, vying for top honors and valuable prizes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- December 13, 2025 -->
+            <div class="timeline-section">
+                <div class="timeline-date">December 13, 2025</div>
+                <!-- Event: Thread of Hope - Symbi Flea Market (Day 2) -->
+                <div class="event-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="event-card-time">10:00 AM – 8:00 PM</div>
+                            <div class="event-card-activity-front">Thread of Hope - Symbi Flea Market (Day 2)</div>
+                            <div class="event-card-type offline">Offline</div>
+                        </div>
+                        <div class="card-back">
+                            <h4>Thread of Hope - Symbi Flea Market (Day 2)</h4>
+                            <p>Day 2 of the Thread of Hope - Symbi Flea Market continues with more vendors, entertainment, and opportunities to discover unique items. Bring your friends and family for another day of shopping, eating, and community fun.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event: Offline Case Competition 2 -->
+                <div class="event-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="event-card-time">2:00 PM – 4:00 PM</div>
+                            <div class="event-card-activity-front">Offline Case Competition 2</div>
+                            <div class="event-card-type offline">Offline</div>
+                        </div>
+                        <div class="card-back">
+                            <h4>Offline Case Competition 2</h4>
+                            <p>Another exciting round of the offline case competition. New teams will demonstrate their analytical skills and strategic thinking to solve complex scenarios, presenting their innovative ideas to the judging panel.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- December 14, 2025 -->
+            <div class="timeline-section">
+                <div class="timeline-date">December 14, 2025</div>
+                <!-- Event: Guest Lecture 1 -->
+                <div class="event-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="event-card-time">10:00 AM – 11:00 AM</div>
+                            <div class="event-card-activity-front">Guest Lecture 1</div>
+                            <div class="event-card-type offline">Offline</div>
+                        </div>
+                        <div class="card-back">
+                            <h4>Guest Lecture 1: By Mrs. Chetna Gala Sinha</h4>
+                            <p><strong>Speaker:</strong> Mrs. Chetna Gala Sinha is a social entrepreneur, activist, and founder of Mann Deshi Mahila Bank, India's first bank for and by rural women. She is a powerful advocate for financial literacy and empowerment among women.</p>
+                            <p>This lecture promises to be thought-provoking and engaging, covering emerging trends and their impact on society, with a focus on empowering communities.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event: Guest Lecture 2 -->
+                <div class="event-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="event-card-time">11:30 AM – 12:30 PM</div>
+                            <div class="event-card-activity-front">Guest Lecture 2</div>
+                            <div class="event-card-type offline">Offline</div>
+                        </div>
+                        <div class="card-back">
+                            <h4>Guest Lecture 2: By Ms. Shaheen Mistri</h4>
+                            <p><strong>Speaker:</strong> Ms. Shaheen Mistri is an Indian social activist and educator. She is the founder of Akanksha Foundation, a non-profit organization that provides education to underprivileged children, and the founder and CEO of Teach For India.</p>
+                            <p>Join us for a session on 'Sustainable Practices in Business' or 'The Power of Education', where a leading expert will share insights on creating lasting positive change through community involvement.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event: Guest Lecture 3 -->
+                <div class="event-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="event-card-time">1:00 PM – 2:00 PM</div>
+                            <div class="event-card-activity-front">Guest Lecture 3</div>
+                            <div class="event-card-type offline">Offline</div>
+                        </div>
+                        <div class="card-back">
+                            <h4>Guest Lecture 3: By Dr. Swati Popat Vats</h4>
+                            <p><strong>Speaker:</strong> Dr. Swati Popat Vats is a leading educationist, known for her pioneering work in early childhood education in India. She is the President of Podar Education Network and promotes holistic development in young learners.</p>
+                            <p>This session will focus on 'Navigating the Global Economy' or 'Innovations in Education', featuring a prominent expert discussing current trends and future directions in their field.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event: Online Case Competition 1 -->
+                <div class="event-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="event-card-time">2:30 PM – 3:30 PM</div>
+                            <div class="event-card-activity-front">Online Case Competition 1</div>
+                            <div class="event-card-type online">Online</div>
+                        </div>
+                        <div class="card-back">
+                            <h4>Online Case Competition 1</h4>
+                            <p>The first round of the online case competition, where teams from various locations will collaborate remotely to solve a contemporary business challenge. Submissions and presentations will be conducted virtually.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event: Online Case Competition 2 -->
+                <div class="event-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="event-card-time">4:00 PM – 5:00 PM</div>
+                            <div class="event-card-activity-front">Online Case Competition 2</div>
+                            <div class="event-card-type online">Online</div>
+                        </div>
+                        <div class="card-back">
+                            <h4>Online Case Competition 2</h4>
+                            <p>The second online case competition challenges participants to develop innovative solutions for a specific industry problem. Teams will utilize digital tools for research and collaboration, culminating in an online presentation.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event: Online Case Competition 3 -->
+                <div class="event-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="event-card-time">5:30 PM – 6:30 PM</div>
+                            <div class="event-card-activity-front">Online Case Competition 3</div>
+                            <div class="event-card-type online">Online</div>
+                        </div>
+                        <div class="card-back">
+                            <h4>Online Case Competition 3</h4>
+                            <p>The final online case competition of the day, pushing teams to their limits with a complex, multi-faceted business scenario. Expect high-stakes presentations and cutting-edge solutions from the competing teams.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event: Vote of thanks & Wrap up -->
+                <div class="event-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="event-card-time">6:30 PM – 7:30 PM</div>
+                            <div class="event-card-activity-front">Vote of thanks & Wrap up</div>
+                            <div class="event-card-type offline">Offline</div>
+                        </div>
+                        <div class="card-back">
+                            <h4>Vote of thanks & Wrap up</h4>
+                            <p>A concluding session to express gratitude to all participants, speakers, sponsors, and volunteers who made the event a success. We'll summarize key takeaways and officially wrap up the event.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
